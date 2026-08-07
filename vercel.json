@@ -1,14 +1,8 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "routes": [
-    {
-      "src": "/api/data",
-      "dest": "/api/data.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+  "rewrites": [
+    { "source": "/", "destination": "/dashboard.html" },
+    { "source": "/api/data", "destination": "/api/data.js" }
   ]
 }
