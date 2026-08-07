@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Local Database
+storage/history.db
+
+# Live Generated Outputs
+reports/
+data.json
+serve_data.log
+serve_data_stdout.log
+
+# Frontend Dev & Dependencies
+node_modules/
+.vercel/
+.env*
+dist/
+.DS_Store

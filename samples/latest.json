@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "collected_at": "2026-08-07T14:51:57Z",
+    "source": "rpc-collector",
+    "endpoint": "https://api.mainnet-beta.solana.com"
+  },
+  "network": {
+    "tps": 4606.4,
+    "avgSlotTimeMs": 421.3,
+    "blockHeight": 437808521,
+    "epochNumber": 1013,
+    "epochProgressPct": 44.57,
+    "epochSlotIndex": 192521,
+    "epochSlotsInEpoch": 432000,
+    "epochSlotStart": 437616000,
+    "epochSlotEnd": 438048000,
+    "epochEtaHours": 28.03,
+    "healthStatus": "healthy"
+  },
+  "validators": {
+    "activeCount": 693,
+    "delinquentCount": 7,
+    "avgCommissionPct": 12.05,
+    "topValidators": [
+      {
+        "votePubkey": "CcaHc2L43ZWjwCHART3oZoJvHLAe9hzT2DJNUpBzoTN1",
+        "name": "CcaHc2L4\u2026",
+        "activated_stake_sol": 16882234.36,
+        "stake_pct": 2.67,
+        "commission": 7
+      },
+      {
+        "votePubkey": "he1iusunGwqrNtafDtLdhsUQDFvo13z9sUa36PauBtk",
+        "name": "he1iusun\u2026",
+        "activated_stake_sol": 15996914.31,
+        "stake_pct": 2.53,
+        "commission": 0
+      },
+      {
+        "votePubkey": "CatzoSMUkTRidT5DwBxAC2pEtnwMBTpkCepHkFgZDiqb",
+        "name": "CatzoSMU\u2026",
+        "activated_stake_sol": 12487724.13,
+        "stake_pct": 1.98,
+        "commission": 5
+      },
+      {
+        "votePubkey": "3N7s9zXMZ4QqvHQR15t5GNHyqc89KduzMP7423eWiD5g",
+        "name": "3N7s9zXM\u2026",
+        "activated_stake_sol": 12275238.62,
+        "stake_pct": 1.94,
+        "commission": 0
+      },
+      {
+        "votePubkey": "26pV97Ce83ZQ6Kz9XT4td8tdoUFPTng8Fb8gPyc53dJx",
+        "name": "26pV97Ce\u2026",
+        "activated_stake_sol": 9139569.3,
+        "stake_pct": 1.45,
+        "commission": 7
+      }
+    ]
+  },
+  "supply": {
+    "collected_at": "2026-08-07T14:52:04Z",
+    "totalSOL": 631756472.5,
+    "circulatingSOL": 582051852.58,
+    "nonCirculatingSOL": 49704619.91
+  },
+  "market": {
+    "priceUsd": 73.61758611906605,
+    "change24hPct": 0.46857610321809334,
+    "marketCapUsd": 43005813241.0,
+    "volume24hUsd": 1510831515.0,
+    "circulatingSupply": 582051866.8439324
+  },
+  "defi": {
+    "tvlUsd": 4742727741.0,
+    "stablecoinSupplyUsd": 16058770305.55,
+    "dexVolume24hUsd": 1379094026.1799998
+  },
+  "news": [
+    {
+      "title": "Solana Changelog: August 6, 2026",
+      "link": "https://solana.com/news/solana-changelog-august-6-2026",
+      "published": "Thu, 06 Aug 2026 17:57:00 GMT",
+      "source": "Solana Blog"
+    },
+    {
+      "title": "Webinar Recap: Giving AI agents a native way to pay with x402",
+      "link": "https://solana.com/news/webinar-recap-agentic-payments",
+      "published": "Wed, 05 Aug 2026 18:55:00 GMT",
+      "source": "Solana Blog"
+    },
+    {
+      "title": "Solana Ecosystem Roundup: July 2026",
+      "link": "https://solana.com/news/solana-ecosystem-roundup-july-2026",
+      "published": "Wed, 05 Aug 2026 09:33:00 GMT",
+      "source": "Solana Blog"
+    },
+    {
+      "title": "Breakpoint 2026: The Token Supercycle",
+      "link": "https://solana.com/news/the-token-supercycle",
+      "published": "Tue, 04 Aug 2026 13:05:00 GMT",
+      "source": "Solana Blog"
+    },
+    {
+      "title": "Inside Solana\u2019s Growing Market for Tokenized Cards and Physical Collectibles",
+      "link": "https://solana.com/news/tokenized-cards-and-physical-collectibles",
+      "published": "Fri, 31 Jul 2026 10:00:00 GMT",
+      "source": "Solana Blog"
+    }
+  ],
+  "economics_extra": {
+    "medianFeeSol": 5e-06,
+    "revUsd24h": 516121.0,
+    "rwaVolumeUsd": 1809547518.097669
+  }
+}

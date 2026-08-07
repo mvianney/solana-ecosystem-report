@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solana Ecosystem Report | Network Health Dashboard</title>
+  <meta name="description" content="Real-time Solana network health dashboard — tracking TPS, validator status, DeFi economics, and ecosystem growth for the Superteam Canada bounty.">
+  <meta name="theme-color" content="#0B0B0F">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       DESIGN SYSTEM — TOKENS
+    ══════════════════════════════════════════════════════════ */
+    :root {
+      --bg:            #0B0B0F;
+      --surface:       #111119;
+      --surface-2:     #17171F;
+      --surface-3:     #1D1D27;
+      --border:        rgba(153, 69, 255, 0.10);
+      --border-2:      rgba(153, 69, 255, 0.22);
+      --border-3:      rgba(20, 241, 149, 0.12);
+      --purple:        #9945FF;
+      --teal:          #14F195;
+      --amber:         #F59E0B;
+      --red:           #EF4444;
+      --green:         #10B981;
+      --text-1:        #EEEEFF;
+      --text-2:        #8A8AB0;
+      --text-3:        #505070;
+      --font-mono:     'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --r:             12px;
+      --r-sm:          8px;
+      --ease:          0.2s ease;
+      --ease-spring:   0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RESET & BASE
+    ══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(153, 69, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(153, 69, 255, 0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: var(--text-1);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(153, 69, 255, 0.45); }
+
+    /* Focus */
+    :focus-visible {
+      outline: 2px solid var(--purple);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    button { font-family: var(--font-sans); }
+
+    /* ══════════════════════════════════════════════════════════
+       UTILITIES
+    ══════════════════════════════════════════════════════════ */
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(110deg, var(--purple) 0%, #C06EFF 40%, var(--teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .mono { font-family: var(--font-mono); }
+
+    .up   { color: var(--teal); }
+    .down { color: var(--red); }
+
+    /* ══════════════════════════════════════════════════════════
+       SITE HEADER
+    ══════════════════════════════════════════════════════════ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(11, 11, 15, 0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Top accent line */
+    .site-header::before {
+      content: '';
+      display: block;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--purple) 30%, var(--teal) 70%, transparent 100%);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Brand */
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sol-icon {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+    }
+
+    .header-title h1 {
+      font-size: clamp(17px, 2vw, 21px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+    }
+
+    .header-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Meta (timestamp) */
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      background: rgba(20, 241, 149, 0.08);
+      border: 1px solid rgba(20, 241, 149, 0.2);
+      border-radius: 100px;
+      padding: 4px 10px;
+    }
+
+    .live-badge.offline {
+      color: var(--amber);
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .live-badge.demo {
+      color: var(--text-3);
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 8px var(--teal);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    .meta-row {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+    }
+
+    /* ── PULSE CANVAS ───────────────────────────────────── */
+    .pulse-strip {
+      height: 58px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pulse-label {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-3);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .pulse-label-right {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-3);
+      pointer-events: none;
+    }
+
+    #pulse-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       HEALTH BAR
+    ══════════════════════════════════════════════════════════ */
+    .health-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .health-bar-inner {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .health-bar-inner::-webkit-scrollbar { display: none; }
+
+    .stat-block {
+      flex: 1;
+      min-width: 130px;
+      padding: 16px 22px;
+      border-right: 1px solid var(--border);
+      cursor: default;
+      transition: background var(--ease);
+      position: relative;
+    }
+
+    .stat-block::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--teal));
+      transition: width 0.3s ease;
+    }
+
+    .stat-block:hover::after { width: 100%; }
+    .stat-block:hover { background: var(--surface-2); }
+    .stat-block:last-child { border-right: none; }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-1);
+      line-height: 1.05;
+    }
+
+    .stat-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    /* Health status in stat bar */
+    .health-indicator {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 2px;
+    }
+
+    .hdot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .hdot.healthy  { background: var(--green);  box-shadow: 0 0 8px var(--green); }
+    .hdot.degraded { background: var(--amber);  box-shadow: 0 0 8px var(--amber); }
+    .hdot.critical { background: var(--red);    box-shadow: 0 0 8px var(--red); }
+
+    /* ══════════════════════════════════════════════════════════
+       MAIN CONTENT AREA
+    ══════════════════════════════════════════════════════════ */
+    .dashboard-main {
+      padding: 36px 0 72px;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ANOMALY ALERTS
+    ══════════════════════════════════════════════════════════ */
+    .alerts-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .alerts-section:empty { display: none; }
+
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: var(--r-sm);
+      background: var(--surface);
+      border: 1px solid transparent;
+      border-left-width: 3px;
+      animation: alert-in 0.3s ease;
+    }
+
+    @keyframes alert-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert.warning {
+      border-color: var(--amber);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, transparent 60%);
+    }
+
+    .alert.critical {
+      border-color: var(--red);
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.06) 0%, transparent 60%);
+    }
+
+    .alert.calm {
+      border-color: rgba(20, 241, 149, 0.3);
+      background: linear-gradient(90deg, rgba(20, 241, 149, 0.05) 0%, transparent 60%);
+    }
+
+    .alert.calm .alert-icon { color: var(--teal); }
+    .alert.calm .alert-title { color: var(--teal); }
+
+    .alert-icon {
+      font-size: 17px;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .alert.warning .alert-icon { color: var(--amber); }
+    .alert.critical .alert-icon { color: var(--red); }
+
+    .alert-body { flex: 1; min-width: 0; }
+
+    .alert-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .alert.warning .alert-title { color: var(--amber); }
+    .alert.critical .alert-title { color: var(--red); }
+
+    .alert-msg {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .alert-time {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 5px;
+    }
+
+    .alert-dismiss {
+      background: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      color: var(--text-3);
+      font-size: 20px;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: color var(--ease), background var(--ease), border-color var(--ease);
+    }
+
+    .alert-dismiss:hover {
+      color: var(--text-1);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border-2);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       METRIC SECTIONS
+    ══════════════════════════════════════════════════════════ */
+    .metric-section {
+      margin-bottom: 44px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
+
+    .section-header::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--purple), var(--teal));
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       CARD GRID
+    ══════════════════════════════════════════════════════════ */
+    .card-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .g-network    { grid-template-columns: repeat(4, 1fr); }
+    .g-validators { grid-template-columns: 1fr 2fr 1fr; }
+    .g-economics  { grid-template-columns: repeat(3, 1fr); }
+    .g-ecosystem  { grid-template-columns: repeat(2, 1fr); }
+
+    /* ══════════════════════════════════════════════════════════
+       CARD BASE
+    ══════════════════════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--ease), box-shadow var(--ease);
+      animation: card-in 0.5s ease both;
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stagger via nth-child */
+    .card:nth-child(1) { animation-delay: 0.04s; }
+    .card:nth-child(2) { animation-delay: 0.08s; }
+    .card:nth-child(3) { animation-delay: 0.12s; }
+    .card:nth-child(4) { animation-delay: 0.16s; }
+    .card:nth-child(5) { animation-delay: 0.20s; }
+    .card:nth-child(6) { animation-delay: 0.24s; }
+
+    /* Gradient border via mask */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--r);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(153, 69, 255, 0.25), rgba(20, 241, 149, 0.08));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Glow on hover */
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 12px 40px rgba(153, 69, 255, 0.10),
+        0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 12px;
+    }
+
+    .card-value {
+      font-family: var(--font-mono);
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--text-1);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .card-value.sm { font-size: 22px; }
+    .card-value.xs { font-size: 17px; }
+
+    .card-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 7px;
+    }
+
+    .card-change {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 7px;
+    }
+
+    /* ── Epoch Progress ──────────────────────── */
+    .progress-wrap {
+      margin-top: 16px;
+      background: var(--surface-3);
+      border-radius: 100px;
+      height: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--purple) 0%, var(--teal) 100%);
+      box-shadow: 0 0 14px rgba(20, 241, 149, 0.35);
+      position: relative;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Shimmer */
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%);
+      animation: shimmer 2.5s linear infinite;
+    }
+
+    @keyframes shimmer {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(100%); }
+    }
+
+    .epoch-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+    }
+
+    /* ── Donut (validator split) ─────────────── */
+    .donut-wrap {
+      position: relative;
+      width: 86px;
+      height: 86px;
+      flex-shrink: 0;
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+    }
+
+    .donut-pct   { font-size: 14px; font-weight: 600; color: var(--teal); }
+    .donut-tiny  { font-size: 8px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1px; }
+
+    .validator-split {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 6px;
+    }
+
+    .val-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    .ldot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .legend-val {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-left: auto;
+      padding-left: 14px;
+    }
+
+    /* ── Validator Table ─────────────────────── */
+    .val-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .val-table th {
+      text-align: left;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .val-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(153, 69, 255, 0.05);
+      color: var(--text-2);
+      vertical-align: middle;
+    }
+
+    .val-table tr:last-child td { border-bottom: none; }
+    .val-table tbody tr { transition: background var(--ease); }
+    .val-table tbody tr:hover td { background: var(--surface-2); }
+
+    .val-rank { color: var(--text-3); width: 28px; }
+    .val-name { color: var(--text-1); font-weight: 500; }
+
+    .stake-bar-bg {
+      width: 90px;
+      height: 4px;
+      background: var(--surface-3);
+      border-radius: 100px;
+    }
+
+    .stake-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--purple), var(--teal));
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       NEWS SECTION
+    ══════════════════════════════════════════════════════════ */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    /* Works as both <div> (dummy) and <a> (live items).  When rendered as
+       an <a> the browser resets text-decoration and color so it reads like
+       a card rather than a hyperlink. */
+    .news-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 16px 18px;
+      transition: border-color var(--ease), background var(--ease), transform var(--ease);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .news-item[href] { cursor: pointer; }
+
+    .news-item:hover {
+      border-color: var(--border-2);
+      background: var(--surface-2);
+      transform: translateY(-1px);
+    }
+
+    .news-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .tag-upgrade         { background: rgba(153, 69, 255, 0.14); color: var(--purple); }
+    .tag-governance      { background: rgba(20, 241, 149, 0.10); color: var(--teal); }
+    .tag-ecosystem       { background: rgba(245, 158, 11, 0.10); color: var(--amber); }
+    .tag-infrastructure  { background: rgba(100, 160, 255, 0.10); color: #78AAFF; }
+    /* Live feed source chips */
+    .tag-solana-blog     { background: rgba(153, 69, 255, 0.14); color: var(--purple); }
+    .tag-cointelegraph-solana { background: rgba(20, 241, 149, 0.10); color: var(--teal); }
+
+    .news-body { flex: 1; min-width: 0; }
+
+    .news-title {
+      font-size: 13px;
+      color: var(--text-1);
+      line-height: 1.5;
+    }
+
+    .news-time {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 6px;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════════ */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 22px 0;
+      text-align: center;
+    }
+
+    .footer-inner {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+    }
+
+    .footer-sep { color: var(--text-3); opacity: 0.4; }
+
+    .footer-inner a {
+      color: var(--text-3);
+      text-decoration: none;
+      transition: color var(--ease);
+    }
+
+    .footer-inner a:hover { color: var(--purple); }
+
+    /* ══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .g-network    { grid-template-columns: repeat(2, 1fr); }
+      .g-validators { grid-template-columns: 1fr 1fr; }
+      .g-economics  { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 720px) {
+      .container { padding: 0 16px; }
+      .g-network    { grid-template-columns: 1fr 1fr; }
+      .g-validators { grid-template-columns: 1fr; }
+      .g-economics  { grid-template-columns: 1fr 1fr; }
+      .g-ecosystem  { grid-template-columns: 1fr 1fr; }
+      .news-grid    { grid-template-columns: 1fr; }
+      .header-meta  { display: none; }
+      .stat-block   { min-width: 120px; padding: 14px 16px; }
+      .stat-value   { font-size: 20px; }
+    }
+
+    @media (max-width: 480px) {
+      .g-network  { grid-template-columns: 1fr; }
+      .g-economics { grid-template-columns: 1fr; }
+      .g-ecosystem { grid-template-columns: 1fr; }
+      .card-value { font-size: 26px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       REDUCED MOTION
+    ══════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .live-dot { animation: none; }
+      .progress-fill::after { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════════
+       HEADER
+  ═════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="header-top">
+
+        <!-- Brand -->
+        <div class="header-brand">
+          <!-- Solana-style three-bar logo -->
+          <svg class="sol-icon" viewBox="0 0 38 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="logoG" x1="0" y1="0" x2="38" y2="34" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"   stop-color="#9945FF"/>
+                <stop offset="100%" stop-color="#14F195"/>
+              </linearGradient>
+            </defs>
+            <path d="M4 2 L34 2 L30 10 L0 10 Z"  fill="url(#logoG)"/>
+            <path d="M0 14 L30 14 L34 22 L4 22 Z" fill="url(#logoG)"/>
+            <path d="M4 26 L34 26 L30 34 L0 34 Z" fill="url(#logoG)"/>
+          </svg>
+
+          <div class="header-title">
+            <h1 class="gradient-text">Solana Ecosystem Report</h1>
+            <div class="header-sub">Network Health Dashboard &nbsp;·&nbsp; Superteam Canada Bounty</div>
+          </div>
+        </div>
+
+        <!-- Meta -->
+        <div class="header-meta" aria-label="Update status">
+          <span class="live-badge">
+            <span class="live-dot" role="status" aria-label="Live feed active"></span>
+            Live
+          </span>
+          <div class="meta-row" id="last-update-display">Last update: —</div>
+          <div class="meta-row" id="next-refresh-display">Next refresh in: —</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Pulse waveform -->
+    <div class="pulse-strip" role="img" aria-label="Slot-time heartbeat waveform monitor">
+      <span class="pulse-label">SLOT TIME</span>
+      <span class="pulse-label-right" id="pulse-tps-badge">— TPS</span>
+      <canvas id="pulse-canvas"></canvas>
+    </div>
+  </header>
+
+
+  <!-- ════════════════════════════════════════════════════
+       HEALTH SUMMARY BAR
+  ═════════════════════════════════════════════════════ -->
+  <div class="health-bar" role="region" aria-label="Key network metrics at a glance">
+    <div class="container">
+      <div class="health-bar-inner">
+
+        <div class="stat-block" tabindex="0">
+          <div class="stat-label">TPS</div>
+          <div class="stat-value" id="sb-tps">—</div>
+          <div class="stat-sub">tx / sec</div>
+        </div>
+
+        <div class="stat-block" tabindex="0">
+          <div class="stat-label">SOL Price</div>
+          <div class="stat-value" id="sb-price">—</div>
+          <div class="stat-sub" id="sb-price-chg">—</div>
+        </div>
+
+        <div class="stat-block" tabindex="0">
+          <div class="stat-label">Active Validators</div>
+          <div class="stat-value" id="sb-validators">—</div>
+          <div class="stat-sub">of total vote accounts</div>
+        </div>
+
+        <div class="stat-block" tabindex="0">
+          <div class="stat-label">TVL</div>
+          <div class="stat-value" id="sb-tvl">—</div>
+          <div class="stat-sub">total value locked</div>
+        </div>
+
+        <div class="stat-block" tabindex="0">
+          <div class="stat-label">Network Status</div>
+          <div class="health-indicator" id="sb-health-wrap">
+            <span class="hdot healthy" id="sb-hdot" aria-hidden="true"></span>
+            <span class="stat-value" id="sb-health" style="font-size:18px">—</span>
+          </div>
+          <div class="stat-sub" id="sb-health-sub">—</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       MAIN DASHBOARD
+  ═════════════════════════════════════════════════════ -->
+  <main class="dashboard-main" id="main-content">
+    <div class="container">
+
+
+      <!-- ── ANOMALY ALERTS ───────────────────────────────── -->
+      <section class="alerts-section" id="alerts-section"
+               aria-label="Anomaly alerts" aria-live="polite" aria-relevant="additions removals">
+        <!-- Populated by JS -->
+      </section>
+
+
+      <!-- ── NETWORK PERFORMANCE ──────────────────────────── -->
+      <section class="metric-section" aria-labelledby="sec-network">
+        <h2 class="section-header" id="sec-network">Network Performance</h2>
+        <div class="card-grid g-network">
+
+          <div class="card" id="card-tps">
+            <div class="card-label">Transactions per Second</div>
+            <div class="card-value mono" id="c-tps">—</div>
+            <div class="card-sub" id="c-tps-sub">2-min rolling average</div>
+          </div>
+
+          <div class="card" id="card-slot">
+            <div class="card-label">Avg Slot Time</div>
+            <div class="card-value mono" id="c-slot">—</div>
+            <div class="card-sub">ms · target: 400 ms</div>
+          </div>
+
+          <div class="card" id="card-block">
+            <div class="card-label">Block Height</div>
+            <div class="card-value sm mono" id="c-block">—</div>
+            <div class="card-sub">current slot</div>
+          </div>
+
+          <div class="card" id="card-epoch">
+            <div class="card-label">Epoch Progress</div>
+            <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:8px;">
+              <div class="card-value mono" id="c-epoch-pct" style="font-size:26px">—</div>
+              <div class="card-sub" style="margin:0" id="c-epoch-num">Epoch —</div>
+            </div>
+            <div class="progress-wrap"
+                 role="progressbar"
+                 aria-valuenow="0"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-label="Epoch completion">
+              <div class="progress-fill" id="epoch-bar" style="width:0%"></div>
+            </div>
+            <div class="epoch-stats">
+              <span id="epoch-start">—</span>
+              <span id="epoch-eta">—</span>
+              <span id="epoch-end">—</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ── VALIDATOR HEALTH ─────────────────────────────── -->
+      <section class="metric-section" aria-labelledby="sec-validators">
+        <h2 class="section-header" id="sec-validators">Validator Health</h2>
+        <div class="card-grid g-validators">
+
+          <!-- Active vs Delinquent donut -->
+          <div class="card" id="card-val-split">
+            <div class="card-label">Active vs Delinquent</div>
+            <div class="validator-split">
+              <div class="donut-wrap" role="img" aria-label="Validator status donut chart">
+                <svg viewBox="0 0 86 86" width="86" height="86" aria-hidden="true" overflow="visible">
+                  <defs>
+                    <linearGradient id="donutG" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%"   stop-color="#9945FF"/>
+                      <stop offset="100%" stop-color="#14F195"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Track -->
+                  <circle cx="43" cy="43" r="32" fill="none"
+                          stroke="#1D1D27" stroke-width="9"/>
+                  <!-- Active arc -->
+                  <circle id="donut-arc" cx="43" cy="43" r="32" fill="none"
+                          stroke="url(#donutG)" stroke-width="9"
+                          stroke-linecap="round"
+                          stroke-dasharray="201.06"
+                          stroke-dashoffset="0"
+                          transform="rotate(-90 43 43)"/>
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-pct" id="donut-pct">—</div>
+                  <div class="donut-tiny">active</div>
+                </div>
+              </div>
+
+              <div class="val-legend">
+                <div class="legend-item">
+                  <span class="ldot" style="background:var(--purple)"></span>
+                  <span>Active</span>
+                  <span class="legend-val" id="val-active">—</span>
+                </div>
+                <div class="legend-item">
+                  <span class="ldot" style="background:var(--red)"></span>
+                  <span>Delinquent</span>
+                  <span class="legend-val" id="val-delinquent" style="color:var(--red)">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top validators table -->
+          <div class="card" id="card-val-table">
+            <div class="card-label">Top Validators by Stake</div>
+            <table class="val-table" aria-label="Top validators by stake percentage">
+              <thead>
+                <tr>
+                  <th class="val-rank">#</th>
+                  <th>Validator</th>
+                  <th>Stake %</th>
+                  <th>Distribution</th>
+                  <th>Commission</th>
+                </tr>
+              </thead>
+              <tbody id="val-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Avg commission -->
+          <div class="card" id="card-commission">
+            <div class="card-label">Average Commission</div>
+            <div class="card-value mono" id="c-commission">—</div>
+            <div class="card-sub">across all active validators</div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ── ECONOMIC INDICATORS ──────────────────────────── -->
+      <section class="metric-section" aria-labelledby="sec-economics">
+        <h2 class="section-header" id="sec-economics">Economic Indicators</h2>
+        <div class="card-grid g-economics">
+
+          <div class="card" id="card-sol">
+            <div class="card-label">SOL Price</div>
+            <div class="card-value mono" id="c-sol">—</div>
+            <div class="card-change" id="c-sol-chg">—</div>
+            <div class="card-sub">24-hour change</div>
+          </div>
+
+          <div class="card" id="card-stables">
+            <div class="card-label">Stablecoin Supply</div>
+            <div class="card-value mono" id="c-stables">—</div>
+            <div class="card-sub">circulating on Solana</div>
+          </div>
+
+          <div class="card" id="card-dex">
+            <div class="card-label">DEX Volume (24h)</div>
+            <div class="card-value mono" id="c-dex">—</div>
+            <div class="card-sub">across all DEXes</div>
+          </div>
+
+          <div class="card" id="card-tvl">
+            <div class="card-label">TVL</div>
+            <div class="card-value mono" id="c-tvl">—</div>
+            <div class="card-sub">total value locked</div>
+          </div>
+
+          <div class="card" id="card-rev">
+            <div class="card-label">REV (24h)</div>
+            <div class="card-value mono" id="c-rev">—</div>
+            <div class="card-sub">real economic value generated</div>
+          </div>
+
+          <div class="card" id="card-fee">
+            <div class="card-label">Median Tx Fee</div>
+            <div class="card-value xs mono" id="c-fee">—</div>
+            <div class="card-sub">SOL per transaction</div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ── ECOSYSTEM GROWTH ─────────────────────────────── -->
+      <section class="metric-section" aria-labelledby="sec-ecosystem">
+        <h2 class="section-header" id="sec-ecosystem">Ecosystem Growth</h2>
+        <div class="card-grid g-ecosystem">
+
+          <div class="card" id="card-rwa">
+            <div class="card-label">Tokenized RWA Volume (24h)</div>
+            <div class="card-value mono" id="c-rwa">—</div>
+            <div class="card-sub">equities &amp; real-world assets on Solana</div>
+          </div>
+
+          <div class="card" id="card-daa">
+            <div class="card-label">Daily Active Addresses</div>
+            <div class="card-value mono" id="c-daa">—</div>
+            <div class="card-sub">unique signing wallets (24h)</div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ── NEWS & UPGRADES ──────────────────────────────── -->
+      <section class="metric-section" aria-labelledby="sec-news">
+        <h2 class="section-header" id="sec-news">News &amp; Upgrades</h2>
+        <div class="news-grid" id="news-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+
+    </div>
+  </main>
+
+
+  <!-- ════════════════════════════════════════════════════
+       FOOTER
+  ═════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <span>Solana Ecosystem Report</span>
+        <span class="footer-sep">·</span>
+        <span>Data: Solana RPC &nbsp;·&nbsp; CoinGecko &nbsp;·&nbsp; DeFiLlama &nbsp;·&nbsp; Solana Blog RSS &nbsp;·&nbsp; Cointelegraph RSS</span>
+        <span class="footer-sep">·</span>
+        <span>Static mockup — live API integration pending</span>
+        <span class="footer-sep">·</span>
+        <span>v0.1.0-alpha</span>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ════════════════════════════════════════════════════
+       JAVASCRIPT
+  ═════════════════════════════════════════════════════ -->
+  <script>
+    "use strict";
+
+    /* ══════════════════════════════════════════════════════════
+       DASHBOARD_DATA — replace values with live API responses
+       Structure deliberately kept flat so each collector maps
+       cleanly to one sub-object (network, validators, etc.)
+    ══════════════════════════════════════════════════════════ */
+    const DASHBOARD_DATA = {
+
+      meta: {
+        lastUpdated:       "2026-08-03T21:34:58Z",   // ISO8601 UTC — from run timestamp
+        refreshIntervalSec: 30,                        // polling cadence
+        dataSource:        "static-mockup",            // swap → "live-api" when wired up
+      },
+
+      network: {
+        tps:               3847,             // getRecentPerformanceSamples → numTransactions/samplePeriodSecs
+        avgSlotTimeMs:     412,              // getRecentPerformanceSamples → samplePeriodSecs*1000/numSlots
+        blockHeight:       284_193_847,      // getSlot
+        epochNumber:       742,              // getEpochInfo → epoch
+        epochProgressPct:  67.3,            // getEpochInfo → (slotIndex / slotsInEpoch) * 100
+        epochSlotStart:    284_108_000,      // derived: currentSlot - slotIndex
+        epochSlotEnd:      284_540_000,      // derived: epochSlotStart + slotsInEpoch
+        epochEtaHours:     4.2,             // derived: (slotsInEpoch - slotIndex) * avgSlotTimeMs / 3_600_000
+        healthStatus:      "healthy",        // "healthy" | "degraded" | "critical"
+      },
+
+      validators: {
+        activeCount:       1521,             // getVoteAccounts → current.length
+        delinquentCount:   23,              // getVoteAccounts → delinquent.length
+        avgCommissionPct:  7.2,             // mean of current[].commission
+        topValidators: [                     // sorted by activatedStake desc
+          { name: "Helius",       stakePct: 8.2,  commissionPct: 5  },
+          { name: "Jito Labs",    stakePct: 7.6,  commissionPct: 8  },
+          { name: "Marinade",     stakePct: 6.1,  commissionPct: 6  },
+          { name: "Galaxy",       stakePct: 4.9,  commissionPct: 7  },
+          { name: "Everstake",    stakePct: 4.3,  commissionPct: 5  },
+        ],
+      },
+
+      economics: {
+        solPriceUSD:        178.42,          // CoinGecko /simple/price?ids=solana
+        solChange24hPct:   +3.7,            // CoinGecko price_change_percentage_24h
+        stablecoinSupplyB:  9.8,            // DeFiLlama /stablecoins?includePrices=true (Solana chain)
+        dexVolume24hB:      4.2,            // DeFiLlama /overview/dexs/solana
+        tvlB:               8.7,            // DeFiLlama /chains → Solana tvl
+        rev24hM:            2.1,            // REV = priority fees + base fees + MEV (derived)
+        medianTxFeeSOL:     0.000025,       // getRecentPrioritizationFees + base 5000 lamports
+      },
+
+      ecosystem: {
+        tokenizedAssetVolM:  847,           // Dune: RWA volume on Solana 24h (USD millions)
+        dailyActiveAddresses: 1_240_000,    // Dune: unique fee-payers in last epoch
+      },
+
+      anomalies: [
+        {
+          id:       "anomaly-tps",
+          severity: "warning",              // "warning" | "critical"
+          title:    "TPS Anomaly Detected",
+          message:  "Transaction throughput dropped ~40% over the last hour (3,847 → 2,298 TPS). Rolling average now 1.8σ below baseline. Possible congestion or leader instability.",
+          time:     "21:14 UTC",
+        },
+        {
+          id:       "anomaly-delinquent",
+          severity: "critical",
+          title:    "Elevated Validator Delinquency",
+          message:  "23 validators currently delinquent (1.49% of active set) — above the configured 1.0% alert threshold. Monitor for stake-weighted impact.",
+          time:     "20:58 UTC",
+        },
+      ],
+
+      news: [
+        {
+          title: "Alpenglow consensus upgrade finalized for Q3 2026 testnet launch",
+          time:  "2h ago",
+          tag:   "upgrade",
+        },
+        {
+          title: "SIMD-525: Dynamic fee market proposal passes community vote with 78% supermajority",
+          time:  "5h ago",
+          tag:   "governance",
+        },
+        {
+          title: "Solana TVL crosses $8.7B as DeFi activity hits six-month high",
+          time:  "8h ago",
+          tag:   "ecosystem",
+        },
+        {
+          title: "Helius launches enhanced RPC infrastructure with sub-50ms latency guarantees",
+          time:  "12h ago",
+          tag:   "infrastructure",
+        },
+      ],
+    };
+
+    /* ══════════════════════════════════════════════════════════
+       UTILITIES
+    ══════════════════════════════════════════════════════════ */
+
+    const $ = id => document.getElementById(id);
+
+    function setText(id, text)  { const e = $(id); if (e) e.textContent = text; }
+    function setHTML(id, html)  { const e = $(id); if (e) e.innerHTML = html; }
+
+    function fmtInt(n)   { return Math.round(n).toLocaleString("en-US"); }
+    function fmtDec(n,d) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+    function fmtUSD(n)   { return "$" + fmtDec(n, 2); }
+    function fmtB(n)     { return "$" + n.toFixed(1) + "B"; }
+    function fmtM(n)     { return "$" + n.toFixed(1) + "M"; }
+    function fmtChg(n)   { return (n >= 0 ? "+" : "") + n.toFixed(1) + "%"; }
+
+    function fmtRelTime(dateStr) {
+      // Parse RFC-2822 ("Wed, 05 Aug 2026 18:55:00 GMT") or ISO-8601.
+      // Returns a human relative string: "just now", "5m ago", "3h ago", "2d ago".
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;  // unparseable — return raw
+      const diffSec = Math.floor((Date.now() - d.getTime()) / 1000);
+      if (diffSec < 60)         return "just now";
+      if (diffSec < 3600)       return Math.floor(diffSec / 60)   + "m ago";
+      if (diffSec < 86400)      return Math.floor(diffSec / 3600) + "h ago";
+      return Math.floor(diffSec / 86400) + "d ago";
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — HEADER
+    ══════════════════════════════════════════════════════════ */
+
+    function renderHeader(data) {
+      // Timestamp — use collected_at when available (live), lastUpdated for dummy
+      const rawTs = data.meta.collected_at || data.meta.lastUpdated;
+      const d = new Date(rawTs);
+      if (!isNaN(d.getTime())) {
+        const opts = { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "UTC" };
+        setText("last-update-display", "Last update: " + d.toLocaleTimeString("en-US", opts) + " UTC");
+      }
+      if (data.network.tps != null) {
+        setText("pulse-tps-badge", fmtInt(data.network.tps) + " TPS");
+      }
+      // Countdown is driven externally by scheduleCountdown() in the fetch loop
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — HEALTH BAR
+    ══════════════════════════════════════════════════════════ */
+
+    function renderHealthBar(data) {
+      const { network: n, economics: e, validators: v } = data;
+
+      setText("sb-tps", fmtInt(n.tps));
+      setText("sb-price", fmtUSD(e.solPriceUSD));
+
+      const chgEl = $("sb-price-chg");
+      if (chgEl) {
+        chgEl.textContent = fmtChg(e.solChange24hPct) + " (24h)";
+        chgEl.className = "stat-sub " + (e.solChange24hPct >= 0 ? "up" : "down");
+      }
+
+      setText("sb-validators", fmtInt(v.activeCount));
+      setText("sb-tvl", fmtB(e.tvlB));
+
+      const s = n.healthStatus;
+      const labels = { healthy: "Healthy", degraded: "Degraded", critical: "Critical" };
+      const subs   = { healthy: "All systems nominal", degraded: "Some issues detected", critical: "Critical issues active" };
+
+      const dot = $("sb-hdot");
+      if (dot) { dot.className = "hdot " + s; }
+      setText("sb-health", labels[s] || s);
+      setText("sb-health-sub", subs[s] || "");
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — NETWORK
+    ══════════════════════════════════════════════════════════ */
+
+    function renderNetwork(data) {
+      const n = data.network;
+      setText("c-tps",   fmtInt(n.tps));
+      setText("c-slot",  fmtInt(n.avgSlotTimeMs) + " ms");
+      setText("c-block", fmtInt(n.blockHeight));
+
+      setText("c-epoch-pct", n.epochProgressPct.toFixed(1) + "%");
+      setText("c-epoch-num", "Epoch " + fmtInt(n.epochNumber));
+
+      const bar = $("epoch-bar");
+      if (bar) {
+        bar.style.width = n.epochProgressPct + "%";
+        bar.parentElement.setAttribute("aria-valuenow", Math.round(n.epochProgressPct));
+      }
+
+      setText("epoch-start", "Slot " + fmtInt(n.epochSlotStart));
+      setText("epoch-eta",   "ETA ~" + n.epochEtaHours.toFixed(1) + "h");
+      setText("epoch-end",   "Slot " + fmtInt(n.epochSlotEnd));
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — VALIDATORS
+    ══════════════════════════════════════════════════════════ */
+
+    function renderValidators(data) {
+      const v = data.validators;
+      const total = v.activeCount + v.delinquentCount;
+      const activePct = (v.activeCount / total) * 100;
+
+      setText("val-active",    fmtInt(v.activeCount));
+      setText("val-delinquent", fmtInt(v.delinquentCount));
+      setText("donut-pct",     activePct.toFixed(1) + "%");
+
+      // Donut arc — circumference = 2π*32 ≈ 201.06
+      const C = 201.06;
+      const arc = $("donut-arc");
+      if (arc) arc.style.strokeDashoffset = C * (1 - activePct / 100);
+
+      setText("c-commission", v.avgCommissionPct.toFixed(1) + "%");
+
+      const tbody = $("val-tbody");
+      if (tbody) {
+        tbody.innerHTML = v.topValidators.map((val, i) => {
+          // stake_pct may be null while supply cache hasn't populated yet
+          const hasPct = val.stakePct != null;
+          const barW   = hasPct ? Math.round((val.stakePct / 10) * 100) : 0;
+          const pctTxt = hasPct ? val.stakePct.toFixed(1) + "%" : "—";
+          return `<tr>
+            <td class="val-rank">${i + 1}</td>
+            <td class="val-name">${val.name}</td>
+            <td>${pctTxt}</td>
+            <td>
+              <div class="stake-bar-bg">
+                <div class="stake-bar-fill" style="width:${barW}%"></div>
+              </div>
+            </td>
+            <td>${val.commissionPct}%</td>
+          </tr>`;
+        }).join("");
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — ECONOMICS
+    ══════════════════════════════════════════════════════════ */
+
+    function renderEconomics(data) {
+      const e = data.economics;
+
+      setText("c-sol",    fmtUSD(e.solPriceUSD));
+      setText("c-stables", fmtB(e.stablecoinSupplyB));
+      setText("c-dex",    fmtB(e.dexVolume24hB));
+      setText("c-tvl",    fmtB(e.tvlB));
+      setText("c-rev",    fmtM(e.rev24hM));
+      setText("c-fee",    e.medianTxFeeSOL.toFixed(6) + " SOL");
+
+      const chgEl = $("c-sol-chg");
+      if (chgEl) {
+        chgEl.textContent = fmtChg(e.solChange24hPct);
+        chgEl.className = "card-change " + (e.solChange24hPct >= 0 ? "up" : "down");
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — ECOSYSTEM
+    ══════════════════════════════════════════════════════════ */
+
+    function renderEcosystem(data) {
+      const ec = data.ecosystem;
+      setText("c-rwa", fmtM(ec.tokenizedAssetVolM));
+      
+      const daaEl = $("c-daa");
+      if (daaEl) {
+        daaEl.innerHTML = `<span style="font-size: 13px; font-style: italic; color: var(--text-3); font-weight: normal; letter-spacing: normal;">Not available — no free public API</span>`;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — ANOMALY ALERTS
+    ══════════════════════════════════════════════════════════ */
+
+    function renderAlerts(data) {
+      const container = $("alerts-section");
+      if (!container) return;
+
+      const alerts = data.alerts || data.anomalies || [];
+
+      if (!alerts.length) {
+        container.innerHTML = `
+          <div class="alert calm" role="status">
+            <div class="alert-icon" aria-hidden="true">✓</div>
+            <div class="alert-body">
+              <div class="alert-title">All Systems Nominal</div>
+              <div class="alert-msg">No statistical network or market anomalies detected across recent snapshots.</div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = alerts.map(a => {
+        const icon = a.severity === "critical" ? "⚠" : "△";
+        const timeStr = a.timestamp ? (fmtRelTime(a.timestamp) || a.timestamp) : (a.time || "");
+        return `<div class="alert ${a.severity}" id="${a.id}" role="alert">
+          <div class="alert-icon" aria-hidden="true">${icon}</div>
+          <div class="alert-body">
+            <div class="alert-title">${a.title}</div>
+            <div class="alert-msg">${a.message}</div>
+            <div class="alert-time">${timeStr}</div>
+          </div>
+          <button class="alert-dismiss"
+                  aria-label="Dismiss: ${a.title}"
+                  onclick="dismissAlert('${a.id}')">×</button>
+        </div>`;
+      }).join("");
+    }
+
+    function dismissAlert(id) {
+      const el = $(id);
+      if (!el) return;
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduced) { el.remove(); return; }
+      el.style.transition = "opacity 0.22s ease, transform 0.22s ease, max-height 0.35s ease, padding 0.35s ease, margin 0.35s ease";
+      el.style.opacity    = "0";
+      el.style.transform  = "translateX(16px)";
+      el.style.maxHeight  = el.offsetHeight + "px";
+      requestAnimationFrame(() => {
+        el.style.maxHeight = "0";
+        el.style.padding   = "0";
+        el.style.margin    = "0";
+        el.style.overflow  = "hidden";
+      });
+      setTimeout(() => el.remove(), 380);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RENDER — NEWS
+    ══════════════════════════════════════════════════════════ */
+
+    function renderNews(data) {
+      const grid = $("news-grid");
+      if (!grid) return;
+
+      // news items may come from the live feed or from DUMMY_DATA placeholders;
+      // live items have { title, link, published, source };
+      // dummy items have { title, time, tag } — handle both shapes gracefully.
+      grid.innerHTML = data.news.map(n => {
+        const isLive    = Boolean(n.link);             // live items always have a link
+        const timeStr   = isLive ? fmtRelTime(n.published) : (n.time || "");
+        const sourceStr = isLive ? (n.source || "Solana") : (n.tag  || "news");
+        // Sanitise: strip any HTML from title (should be plain text from RSS)
+        const titleHtml = (n.title || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        const inner = `
+          <span class="news-tag tag-${sourceStr.toLowerCase().replace(/\s+/g, "-")}">${sourceStr}</span>
+          <div class="news-body">
+            <div class="news-title">${titleHtml}</div>
+            <div class="news-time">${timeStr}</div>
+          </div>`;
+
+        return isLive
+          ? `<a class="news-item" href="${n.link}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+          : `<div class="news-item">${inner}</div>`;
+      }).join("");
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MASTER RENDER
+    ══════════════════════════════════════════════════════════ */
+
+    function render(data) {
+      renderHeader(data);
+      renderHealthBar(data);
+      renderNetwork(data);
+      renderValidators(data);
+      renderEconomics(data);
+      renderEcosystem(data);
+      renderAlerts(data);
+      renderNews(data);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PULSE CANVAS — slot-time heartbeat waveform
+       Physics: spring + damping + periodic beat impulse
+    ══════════════════════════════════════════════════════════ */
+
+    (function initPulse() {
+      const canvas  = $("pulse-canvas");
+      if (!canvas) return;
+
+      const ctx     = canvas.getContext("2d");
+      const DPR     = Math.min(window.devicePixelRatio || 1, 2);
+      const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const H_CSS   = 58; // logical canvas height in px
+
+      // Physics state
+      let physY    = 0.5;
+      let physV    = 0;
+      let beatTick = 0;
+      let points   = [];
+      let rafId    = null;
+
+      /* ── Size canvas to parent ──────────────────── */
+      function resize() {
+        const W = canvas.parentElement.clientWidth;
+        canvas.width  = W * DPR;
+        canvas.height = H_CSS * DPR;
+        canvas.style.width  = W + "px";
+        canvas.style.height = H_CSS + "px";
+
+        // Fill points buffer to current width
+        while (points.length < W) points.unshift(0.5 + (Math.random() - 0.5) * 0.04);
+        while (points.length > W) points.shift();
+      }
+
+      /* ── Generate next data point via physics ───── */
+      function nextPoint() {
+        beatTick++;
+
+        // Spring toward centre with damping + noise
+        physV += (0.5 - physY) * 0.042;
+        physV *= 0.815;
+        physV += (Math.random() - 0.5) * 0.007;
+
+        // Main beat (every ~72 frames ≈ ~1.2s at 60fps → "slot blocks")
+        const bc = beatTick % 72;
+        if (bc === 0)  physV -= 0.42;   // sharp upstroke (fast slot confirmation)
+        if (bc === 3)  physV += 0.28;   // rebound
+        if (bc === 7)  physV -= 0.06;   // T-wave ripple
+
+        // Slow-slot anomaly spike (every ~380 frames)
+        if (beatTick % 380 === 190) physV += 0.30;
+        if (beatTick % 380 === 200) physV -= 0.18;
+
+        physY = Math.max(0.07, Math.min(0.93, physY + physV));
+        return physY;
+      }
+
+      /* ── Draw the waveform ──────────────────────── */
+      function draw() {
+        const W = canvas.width  / DPR;
+        const H = canvas.height / DPR;
+
+        // Use device-pixel-aware transform
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+
+        if (points.length < 2) return;
+
+        const gradL = ctx.createLinearGradient(0, 0, W, 0);
+        gradL.addColorStop(0,    "rgba(153,69,255,0.0)");
+        gradL.addColorStop(0.15, "rgba(153,69,255,0.35)");
+        gradL.addColorStop(0.6,  "rgba(130,100,255,0.75)");
+        gradL.addColorStop(1,    "rgba(20,241,149,1)");
+
+        // Draw path helper
+        function buildPath() {
+          ctx.beginPath();
+          for (let i = 0; i < points.length; i++) {
+            const x  = (i / (points.length - 1)) * W;
+            const py = points[i] * H;
+            if (i === 0) ctx.moveTo(x, py);
+            else         ctx.lineTo(x, py);
+          }
+        }
+
+        // Outer glow
+        buildPath();
+        ctx.strokeStyle = gradL;
+        ctx.lineWidth   = 7;
+        ctx.lineCap     = "round";
+        ctx.lineJoin    = "round";
+        ctx.shadowBlur  = 18;
+        ctx.shadowColor = "rgba(153,69,255,0.55)";
+        ctx.stroke();
+        ctx.shadowBlur  = 0;
+
+        // Sharp inner line
+        buildPath();
+        const gradS = ctx.createLinearGradient(0, 0, W, 0);
+        gradS.addColorStop(0,    "rgba(153,69,255,0.0)");
+        gradS.addColorStop(0.2,  "rgba(153,69,255,0.7)");
+        gradS.addColorStop(1,    "rgba(20,241,149,1)");
+        ctx.strokeStyle = gradS;
+        ctx.lineWidth   = 1.6;
+        ctx.stroke();
+
+        // Leading-edge glow dot
+        const lx = W;
+        const ly = points[points.length - 1] * H;
+        ctx.beginPath();
+        ctx.arc(lx, ly, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle  = "#14F195";
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = "#14F195";
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Horizontal centre reference line (very subtle)
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.5);
+        ctx.lineTo(W, H * 0.5);
+        ctx.strokeStyle = "rgba(153,69,255,0.06)";
+        ctx.lineWidth   = 1;
+        ctx.setLineDash([4, 8]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      /* ── Static (reduced-motion) draw ──────────── */
+      function drawStatic() {
+        const W = canvas.width  / DPR;
+        const H = canvas.height / DPR;
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+
+        const g = ctx.createLinearGradient(0, 0, W, 0);
+        g.addColorStop(0, "rgba(153,69,255,0.2)");
+        g.addColorStop(1, "rgba(20,241,149,0.5)");
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.5);
+        ctx.lineTo(W, H * 0.5);
+        ctx.strokeStyle = g;
+        ctx.lineWidth   = 1.5;
+        ctx.stroke();
+      }
+
+      /* ── Animation loop ─────────────────────────── */
+      function frame() {
+        points.shift();
+        points.push(nextPoint());
+        draw();
+        rafId = requestAnimationFrame(frame);
+      }
+
+      /* ── Init ────────────────────────────────────── */
+      resize();
+
+      let resizeTimer;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          cancelAnimationFrame(rafId);
+          resize();
+          if (REDUCED) drawStatic();
+          else { rafId = requestAnimationFrame(frame); }
+        }, 80);
+      });
+
+      if (REDUCED) {
+        drawStatic();
+      } else {
+        rafId = requestAnimationFrame(frame);
+      }
+    })();
+
+    /* ══════════════════════════════════════════════════════════
+       LIVE DATA — fetch + map + render loop
+    ══════════════════════════════════════════════════════════ */
+
+    const DATA_URL    = "./data.json";
+    const REFRESH_MS  = 5_000;      // matches fast-tier cadence in serve_data.py (5 s)
+
+    // Rename dummy object for clarity (still used as fallback + base for merge)
+    const DUMMY_DATA = DASHBOARD_DATA;
+
+    // Preserved across polls so supply fields never blank mid-session
+    let _cachedSupply = null;
+    let _countdownHandle = null;
+
+    /* ── Badge state ──────────────────────────────────────────────────── */
+    function setLiveBadge(mode) {
+      const badge = document.querySelector(".live-badge");
+      if (!badge) return;
+      if (mode === "live") {
+        badge.innerHTML = '<span class="live-dot" role="status" aria-label="Live feed active"></span> Live';
+        badge.className = "live-badge";
+      } else if (mode === "offline") {
+        badge.textContent = "OFFLINE";
+        badge.className = "live-badge offline";
+      } else {
+        badge.textContent = "DEMO DATA";
+        badge.className = "live-badge demo";
+      }
+    }
+
+    /* ── Countdown (replaces the one that was inside renderHeader) ──────── */
+    function scheduleCountdown(totalSecs) {
+      clearTimeout(_countdownHandle);
+      let remaining = Math.max(0, totalSecs);
+      (function tick() {
+        setText("next-refresh-display", "Next refresh in: " + remaining + "s");
+        if (remaining-- > 0) _countdownHandle = setTimeout(tick, 1000);
+      })();
+    }
+
+    /* ── Schema bridge: data.json  →  render-function shape ──────────── */
+    function mapLiveData(live) {
+      // Start with a deep clone of dummy so unmapped fields (economics,
+      // ecosystem, news, anomalies) keep their demo values.
+      const out = JSON.parse(JSON.stringify(DUMMY_DATA));
+
+      if (!live) return out;
+
+      const m = live.meta       || {};
+      const n = live.network    || {};
+      const v = live.validators || {};
+      const s = live.supply;          // may be null
+
+      // ── meta ────────────────────────────────────────────────────────
+      if (m.collected_at)        out.meta.collected_at     = m.collected_at;
+      if (m.fast_interval_sec)   out.meta.refreshIntervalSec = m.fast_interval_sec;
+
+      // ── network ─────────────────────────────────────────────────────
+      if (n.tps            != null) out.network.tps            = n.tps;
+      if (n.avgSlotTimeMs  != null) out.network.avgSlotTimeMs  = n.avgSlotTimeMs;
+      if (n.blockHeight    != null) out.network.blockHeight     = n.blockHeight;
+      if (n.epochNumber    != null) out.network.epochNumber     = n.epochNumber;
+      if (n.epochProgressPct != null) out.network.epochProgressPct = n.epochProgressPct;
+      if (n.epochSlotStart != null) out.network.epochSlotStart  = n.epochSlotStart;
+      if (n.epochSlotEnd   != null) out.network.epochSlotEnd    = n.epochSlotEnd;
+      if (n.epochEtaHours  != null) out.network.epochEtaHours   = n.epochEtaHours;
+      if (n.healthStatus)           out.network.healthStatus    = n.healthStatus;
+
+      // ── validators ──────────────────────────────────────────────────
+      if (v.activeCount      != null) out.validators.activeCount     = v.activeCount;
+      if (v.delinquentCount  != null) out.validators.delinquentCount = v.delinquentCount;
+      if (v.avgCommissionPct != null) out.validators.avgCommissionPct = v.avgCommissionPct;
+
+      if (Array.isArray(v.topValidators) && v.topValidators.length) {
+        out.validators.topValidators = v.topValidators.map(val => ({
+          name:          val.name,
+          // stake_pct comes from supply cross-ref; may be null until supply cached
+          stakePct:      val.stake_pct,
+          commissionPct: val.commission,
+        }));
+      }
+
+      // ── market / economics ──────────────────────────────────────────
+      const mk = live.market;
+      if (mk) {
+        if (mk.priceUsd != null)     out.economics.solPriceUSD     = mk.priceUsd;
+        if (mk.change24hPct != null) out.economics.solChange24hPct = mk.change24hPct;
+      }
+
+      // ── defi / economics ────────────────────────────────────────────
+      const df = live.defi;
+      if (df) {
+        if (df.tvlUsd != null)               out.economics.tvlB                = df.tvlUsd / 1e9;
+        if (df.stablecoinSupplyUsd != null)  out.economics.stablecoinSupplyB = df.stablecoinSupplyUsd / 1e9;
+        if (df.dexVolume24hUsd != null)      out.economics.dexVolume24hB       = df.dexVolume24hUsd / 1e9;
+      }
+
+      // ── economics_extra ─────────────────────────────────────────────
+      const ee = live.economics_extra;
+      if (ee) {
+        if (ee.medianFeeSol != null)   out.economics.medianTxFeeSOL     = ee.medianFeeSol;
+        if (ee.revUsd24h != null)      out.economics.rev24hM            = ee.revUsd24h / 1e6;
+        if (ee.rwaVolumeUsd != null)   out.ecosystem.tokenizedAssetVolM = ee.rwaVolumeUsd / 1e6;
+      }
+
+      // ── news ────────────────────────────────────────────────────────
+      // Only overwrite dummy news when the live feed has items; if the cache
+      // hasn't populated yet (empty []) keep showing the dummy placeholders.
+      if (Array.isArray(live.news) && live.news.length > 0) {
+        out.news = live.news.map(item => ({
+          title:     item.title     || "",
+          link:      item.link      || "",
+          published: item.published || "",
+          source:    item.source    || "Solana",
+        }));
+      }
+
+      // ── alerts / anomalies ─────────────────────────────────────────
+      const rawAlerts = live.alerts || live.anomalies;
+      if (Array.isArray(rawAlerts)) {
+        out.alerts = rawAlerts;
+        out.anomalies = rawAlerts;
+      }
+
+      return out;
+    }
+
+    /* ── Fetch, map, render ─────────────────────────────────────────── */
+    let _cachedMarket = null;
+    let _cachedDefi   = null;
+    let _cachedNews   = null;   // retains last-good list across polls
+    let _cachedAlerts = null;   // retains last-good alerts across polls
+    let _cachedEcon   = null;   // retains last-good economics_extra across polls
+
+    async function fetchAndRender() {
+      const pollId = new Date().toISOString().substring(11, 19);
+      try {
+        // Cache-bust so the browser always gets the freshest file from Vite
+        const res = await fetch(DATA_URL + "?_=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const liveJson = await res.json();
+
+        // Supply null-safety: retain last known supply across polls
+        if (liveJson.supply != null) {
+          _cachedSupply = liveJson.supply;
+        } else if (_cachedSupply != null) {
+          liveJson.supply = _cachedSupply;  // backfill cached value
+        }
+
+        // Market null-safety: retain last known market data if current poll missed it
+        if (liveJson.market != null) {
+          _cachedMarket = liveJson.market;
+        } else if (_cachedMarket != null) {
+          console.warn(`[dashboard ${pollId}] liveJson.market is null — using cached market data`);
+          liveJson.market = _cachedMarket;
+        }
+
+        // DeFi null-safety: retain last known defi data if current poll missed it
+        if (liveJson.defi != null) {
+          _cachedDefi = liveJson.defi;
+        } else if (_cachedDefi != null) {
+          console.warn(`[dashboard ${pollId}] liveJson.defi is null — using cached defi data`);
+          liveJson.defi = _cachedDefi;
+        }
+
+        // News null-safety: retain last-good list; never revert to [] on transient failure
+        if (Array.isArray(liveJson.news) && liveJson.news.length > 0) {
+          _cachedNews = liveJson.news;
+        } else if (_cachedNews != null) {
+          console.warn(`[dashboard ${pollId}] liveJson.news empty/null — using cached news`);
+          liveJson.news = _cachedNews;
+        }
+
+        // Alerts null-safety: retain last known alerts array across polls
+        const rawAlerts = liveJson.alerts || liveJson.anomalies;
+        if (Array.isArray(rawAlerts)) {
+          _cachedAlerts = rawAlerts;
+        } else if (_cachedAlerts != null) {
+          liveJson.alerts = _cachedAlerts;
+          liveJson.anomalies = _cachedAlerts;
+        }
+
+        // Economics null-safety: retain last known economics_extra across polls
+        if (liveJson.economics_extra != null) {
+          _cachedEcon = liveJson.economics_extra;
+        } else if (_cachedEcon != null) {
+          console.warn(`[dashboard ${pollId}] liveJson.economics_extra is null — using cached economics data`);
+          liveJson.economics_extra = _cachedEcon;
+        }
+
+        const data = mapLiveData(liveJson);
+        render(data);
+        setLiveBadge("live");
+        console.log(`[dashboard ${pollId}] Fetch SUCCESS: TPS=${liveJson.network?.tps}, Price=${liveJson.market?.priceUsd}`);
+        scheduleCountdown(liveJson.meta?.fast_interval_sec || 5);
+
+      } catch (err) {
+        console.warn(`[dashboard ${pollId}] data.json fetch FAILED — using demo data:`, err.message);
+        render(DUMMY_DATA);
+        setLiveBadge("offline");
+        scheduleCountdown(5);
+      }
+    }
+
+    /* ── Boot ────────────────────────────────────────────────────────── */
+    // Render dummy data immediately so the UI isn't blank while the first
+    // fetch is in flight, then layer in live data as soon as it arrives.
+    render(DUMMY_DATA);
+    setLiveBadge("demo");
+    fetchAndRender();
+    setInterval(fetchAndRender, REFRESH_MS);
+
+  </script>
+</body>
+</html>
