@@ -1,80 +1,44 @@
 {
   "meta": {
-    "collected_at": "2026-08-07T14:51:57Z",
+    "collected_at": "2026-08-07T15:21:09Z",
     "source": "rpc-collector",
     "endpoint": "https://api.mainnet-beta.solana.com"
   },
   "network": {
-    "tps": 4606.4,
-    "avgSlotTimeMs": 421.3,
-    "blockHeight": 437808521,
+    "tps": 4390.3,
+    "avgSlotTimeMs": 423.6,
+    "blockHeight": 437812659,
     "epochNumber": 1013,
-    "epochProgressPct": 44.57,
-    "epochSlotIndex": 192521,
+    "epochProgressPct": 45.52,
+    "epochSlotIndex": 196659,
     "epochSlotsInEpoch": 432000,
     "epochSlotStart": 437616000,
     "epochSlotEnd": 438048000,
-    "epochEtaHours": 28.03,
+    "epochEtaHours": 27.69,
     "healthStatus": "healthy"
   },
   "validators": {
-    "activeCount": 693,
-    "delinquentCount": 7,
-    "avgCommissionPct": 12.05,
-    "topValidators": [
-      {
-        "votePubkey": "CcaHc2L43ZWjwCHART3oZoJvHLAe9hzT2DJNUpBzoTN1",
-        "name": "CcaHc2L4\u2026",
-        "activated_stake_sol": 16882234.36,
-        "stake_pct": 2.67,
-        "commission": 7
-      },
-      {
-        "votePubkey": "he1iusunGwqrNtafDtLdhsUQDFvo13z9sUa36PauBtk",
-        "name": "he1iusun\u2026",
-        "activated_stake_sol": 15996914.31,
-        "stake_pct": 2.53,
-        "commission": 0
-      },
-      {
-        "votePubkey": "CatzoSMUkTRidT5DwBxAC2pEtnwMBTpkCepHkFgZDiqb",
-        "name": "CatzoSMU\u2026",
-        "activated_stake_sol": 12487724.13,
-        "stake_pct": 1.98,
-        "commission": 5
-      },
-      {
-        "votePubkey": "3N7s9zXMZ4QqvHQR15t5GNHyqc89KduzMP7423eWiD5g",
-        "name": "3N7s9zXM\u2026",
-        "activated_stake_sol": 12275238.62,
-        "stake_pct": 1.94,
-        "commission": 0
-      },
-      {
-        "votePubkey": "26pV97Ce83ZQ6Kz9XT4td8tdoUFPTng8Fb8gPyc53dJx",
-        "name": "26pV97Ce\u2026",
-        "activated_stake_sol": 9139569.3,
-        "stake_pct": 1.45,
-        "commission": 7
-      }
-    ]
+    "activeCount": null,
+    "delinquentCount": null,
+    "avgCommissionPct": null,
+    "topValidators": []
   },
   "supply": {
-    "collected_at": "2026-08-07T14:52:04Z",
-    "totalSOL": 631756472.5,
-    "circulatingSOL": 582051852.58,
+    "collected_at": "2026-08-07T15:21:24Z",
+    "totalSOL": 631756452.72,
+    "circulatingSOL": 582051832.81,
     "nonCirculatingSOL": 49704619.91
   },
   "market": {
-    "priceUsd": 73.61758611906605,
-    "change24hPct": 0.46857610321809334,
-    "marketCapUsd": 43005813241.0,
-    "volume24hUsd": 1510831515.0,
-    "circulatingSupply": 582051866.8439324
+    "priceUsd": 73.7404497779168,
+    "change24hPct": 0.5983903878183348,
+    "marketCapUsd": 42935007361.0,
+    "volume24hUsd": 1521802582.0,
+    "circulatingSupply": 582051845.3931724
   },
   "defi": {
-    "tvlUsd": 4742727741.0,
-    "stablecoinSupplyUsd": 16058770305.55,
+    "tvlUsd": 4750230694.0,
+    "stablecoinSupplyUsd": 16088094681.27,
     "dexVolume24hUsd": 1379094026.1799998
   },
   "news": [
@@ -112,6 +76,6 @@
   "economics_extra": {
     "medianFeeSol": 5e-06,
     "revUsd24h": 516121.0,
-    "rwaVolumeUsd": 1809547518.097669
+    "rwaVolumeUsd": 1815709513.7486901
   }
 }

@@ -1870,9 +1870,15 @@
     async function fetchAndRender() {
       const pollId = new Date().toISOString().substring(11, 19);
       try {
-        // Cache-bust so the browser always gets the freshest file from Vite
-        const res = await fetch(DATA_URL + "?_=" + Date.now(), { cache: "no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
+        let res;
+        try {
+          res = await fetch("/api/data?_=" + Date.now(), { cache: "no-store" });
+          if (!res.ok) throw new Error("API route " + res.status);
+        } catch (apiErr) {
+          // Fallback to local static data.json (Vite dev server)
+          res = await fetch(DATA_URL + "?_=" + Date.now(), { cache: "no-store" });
+          if (!res.ok) throw new Error("Fallback static file " + res.status);
+        }
         const liveJson = await res.json();
 
         // Supply null-safety: retain last known supply across polls

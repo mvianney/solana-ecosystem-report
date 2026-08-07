@@ -1,5 +1,5 @@
 # Solana Ecosystem Health Report
-*Generated at: `2026-08-07T14:51:57Z` (UTC)*
+*Generated at: `2026-08-07T15:21:09Z` (UTC)*
 
 ## Anomaly & Alert Summary
 ✅ **All systems nominal.** No anomalies detected in current network performance metrics.
@@ -7,40 +7,34 @@
 ## Network Performance
 | Metric | Current Value | Details |
 |---|---|---|
-| **TPS** | 4,606.40 | Rolling 60s transaction throughput |
-| **Slot Time** | 421.30 ms | Avg time to produce a block |
-| **Block Height** | 437,808,521 | Current finalized slot |
-| **Epoch Progress** | 44.6% complete | Epoch 1013 (~28.03h remaining) |
+| **TPS** | 4,390.30 | Rolling 60s transaction throughput |
+| **Slot Time** | 423.60 ms | Avg time to produce a block |
+| **Block Height** | 437,812,659 | Current finalized slot |
+| **Epoch Progress** | 45.5% complete | Epoch 1013 (~27.69h remaining) |
 | **Health Status** | HEALTHY | RPC node status check |
 
 ## Validator Health
-- **Active Validators**: 693
-- **Delinquent Validators**: 7
-- **Average Validator Commission**: 12.05%
+- **Active Validators**: N/A
+- **Delinquent Validators**: N/A
+- **Average Validator Commission**: N/A
 
 ### Top 5 Validators by Activated Stake
-| Rank | Validator Name / Pubkey | Activated Stake | Stake Share | Commission |
-|:---:|---|---|:---:|:---:|
-| 1 | `CcaHc2L4…` | 16,882,234.36 SOL | 2.67% | 7% |
-| 2 | `he1iusun…` | 15,996,914.31 SOL | 2.53% | 0% |
-| 3 | `CatzoSMU…` | 12,487,724.13 SOL | 1.98% | 5% |
-| 4 | `3N7s9zXM…` | 12,275,238.62 SOL | 1.94% | 0% |
-| 5 | `26pV97Ce…` | 9,139,569.30 SOL | 1.45% | 7% |
+*Top validator stake distribution metrics are currently cached/unavailable.*
 
 ## Economic Indicators
 | Metric | Value | Source |
 |---|---|---|
-| **SOL Price (USD)** | $73.62 (+0.47%) | Jupiter Spot Price |
-| **Market Cap** | $43.01B | CoinGecko |
-| **CEX Volume (24h)** | $1.51B | CoinGecko |
-| **DeFi TVL (USD)** | $4.74B | DeFiLlama |
-| **Stablecoin Supply** | $16.06B | DeFiLlama |
+| **SOL Price (USD)** | $73.74 (+0.60%) | Jupiter Spot Price |
+| **Market Cap** | $42.94B | CoinGecko |
+| **CEX Volume (24h)** | $1.52B | CoinGecko |
+| **DeFi TVL (USD)** | $4.75B | DeFiLlama |
+| **Stablecoin Supply** | $16.09B | DeFiLlama |
 | **DEX Volume (24h)** | $1.38B | DeFiLlama |
 | **Real Economic Value (REV)** | $516.12K | DeFiLlama (User fees) |
 | **Median Transaction Fee** | 0.000005 SOL | Solana JSON-RPC (priority + base) |
 
 ## Ecosystem Growth
-- **Tokenized RWA TVL**: $1.81B *(Source: DeFiLlama RWA category)*
+- **Tokenized RWA TVL**: $1.82B *(Source: DeFiLlama RWA category)*
 - **Daily Active Addresses**: *Not available — no free public API*
 
 ## News & Announcements
