@@ -123,8 +123,18 @@ async function getDeFiLlama() {
     if (stableRes && Array.isArray(stableRes.peggedAssets)) {
       let sum = 0;
       for (const asset of stableRes.peggedAssets) {
-        if (asset.chainBalances?.Solana) {
-          sum += asset.chainBalances.Solana;
+        const chainCirc = asset.chainCirculating || {};
+        const solanaData = chainCirc.Solana || {};
+        const currentAmount = solanaData.current || {};
+        
+        if (typeof currentAmount === "object" && currentAmount !== null) {
+          const usdVal = currentAmount.peggedUSD || currentAmount.usd;
+          if (usdVal != null) {
+            sum += parseFloat(usdVal);
+          }
+        } else if (typeof currentAmount === "number") {
+          const price = asset.price || 1.0;
+          sum += currentAmount * price;
         }
       }
       if (sum > 0) stablecoinSupplyUsd = sum;
@@ -397,7 +407,7 @@ export default async function handler(req, res) {
     // 5. Caching slow variables
     // Supply
     if (!supplyCache || (now - lastUpdated.supply > 60000)) {
-      const supplyRes = await rpcCall("getSupply", [{ "excludeNonCirculatingAccountsList": true }]);
+      const supplyRes = await rpcCall("getSupply", [{ "excludeNonCirculatingAccountsList": true }], 12000);
       if (supplyRes && supplyRes.value) {
         const val = supplyRes.value;
         supplyCache = {
