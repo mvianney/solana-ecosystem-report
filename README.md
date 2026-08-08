@@ -72,7 +72,11 @@ Every fast cycle, the pipeline evaluates the current snapshot against a rolling 
 *   **Z-Score Calculations**: Evaluates deviation threshold:
     $$\sigma = \frac{\text{Current Value} - \mu}{\text{Std Dev}}$$
 *   **Variance Noise Floor**: If standard deviation approaches zero (low-variance test or local startup environments), the detector floors $\text{Std Dev}$ at $2\%$ of the baseline mean to prevent standard deviation division explosions.
-*   **Alert Routing**: Any triggered alert is merged into the top-level `"alerts"` list in `data.json`, rendering dynamic warnings inside the UI, and appending warning/critical indicators directly inside `reports/latest.md`.
+*   **Multi-Source Correlation Engine (Innovation Layer)**: After identifying single-metric anomalies, a secondary correlation processor checks for co-occurring deviations:
+    *   *Network Stress*: Co-occurrence of a TPS drop and a Slot Time surge elevates the alert to a critical "Network Stress Detected" status, validating that throughput slowdowns are systemic and not isolated leader noise.
+    *   *Correlated Market Shift*: Co-occurrence of price shift and TVL shift in the same direction flags a broader market-wide shift rather than a single-source API glitch.
+    *   *Isolated Validator Delinquency*: If validator delinquency spikes while network TPS and slot times remain nominal, the alert is tagged as "Isolated Delinquency", noting that the network health is unaffected.
+*   **Alert Routing**: Triggered single-metric and correlated anomalies are merged into the top-level `"alerts"` list in `data.json` and highlighted with a **"Multi-Source"** badge in the UI. They are also compiled directly into the markdown reports.
 
 ---
 

@@ -1393,10 +1393,11 @@
       container.innerHTML = alerts.map(a => {
         const icon = a.severity === "critical" ? "⚠" : "△";
         const timeStr = a.timestamp ? (fmtRelTime(a.timestamp) || a.timestamp) : (a.time || "");
+        const badge = a.type === "correlated" ? `<span class="news-tag" style="margin-left: 8px; vertical-align: middle; background: rgba(59, 130, 246, 0.15); color: var(--accent); border-color: rgba(59, 130, 246, 0.25);">Multi-Source</span>` : "";
         return `<div class="alert ${a.severity}" id="${a.id}" role="alert">
           <div class="alert-icon" aria-hidden="true">${icon}</div>
           <div class="alert-body">
-            <div class="alert-title">${a.title}</div>
+            <div class="alert-title">${a.title}${badge}</div>
             <div class="alert-msg">${a.message}</div>
             <div class="alert-time">${timeStr}</div>
           </div>

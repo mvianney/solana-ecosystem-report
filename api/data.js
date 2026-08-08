@@ -331,6 +331,84 @@ function detectAnomalies(current, history) {
   return alerts;
 }
 
+function detectCorrelatedAnomalies(current, history, singleAlerts) {
+  const correlated = [];
+  const nowVal = current.meta?.collected_at || new Date().toISOString();
+  const nowTime = nowVal.substring(11, 16) + " UTC";
+  
+  const activeMetrics = new Set(singleAlerts.map(a => a.id ? a.id.replace("anomaly-", "") : ""));
+  
+  // 1. Congestion Check
+  if (activeMetrics.has("tps") && activeMetrics.has("slotTime")) {
+    correlated.push({
+      id: "correlation-congestion",
+      type: "correlated",
+      severity: "critical",
+      metric: "congestion",
+      title: "Network Stress Detected (Multi-Source)",
+      message: "Network stress detected: TPS drop + slot time increase occurring together — consistent with congestion, not isolated noise.",
+      time: nowTime,
+      timestamp: nowVal,
+      related_metrics: ["tps", "slotTime"]
+    });
+  }
+  
+  // 2. Market Event Check
+  if (activeMetrics.has("price") && activeMetrics.has("tvl")) {
+    let priceDir = 0;
+    const currPrice = current.market?.priceUsd;
+    let prevPrice = null;
+    if (history.length > 0) {
+      prevPrice = history[history.length - 1].market?.priceUsd;
+    }
+    if (currPrice != null && prevPrice != null && prevPrice > 0) {
+      priceDir = currPrice > prevPrice ? 1 : -1;
+    }
+    
+    let tvlDir = 0;
+    const currTvl = current.defi?.tvlUsd;
+    const histTvls = history.map(h => h.defi?.tvlUsd).filter(v => v != null);
+    if (currTvl != null && histTvls.length > 0) {
+      const tvlMean = histTvls.reduce((a, b) => a + b, 0) / histTvls.length;
+      tvlDir = currTvl > tvlMean ? 1 : -1;
+    }
+    
+    if (priceDir !== 0 && tvlDir !== 0 && priceDir === tvlDir) {
+      const directionStr = priceDir > 0 ? "upward" : "downward";
+      correlated.push({
+        id: "correlation-market",
+        type: "correlated",
+        severity: "critical",
+        metric: "market",
+        title: "Correlated Market Shift (Multi-Source)",
+        message: `Correlated market movement: SOL price and TVL moved together in a ${directionStr} direction — broader market event likely, not an isolated data anomaly.`,
+        time: nowTime,
+        timestamp: nowVal,
+        related_metrics: ["price", "tvl"]
+      });
+    }
+  }
+  
+  // 3. Isolated Validator Delinquency Check
+  if (activeMetrics.has("delinquency")) {
+    if (!activeMetrics.has("tps") && !activeMetrics.has("slotTime")) {
+      correlated.push({
+        id: "correlation-isolated-delinquency",
+        type: "correlated",
+        severity: "warning",
+        metric: "delinquency",
+        title: "Isolated Delinquency (Multi-Source)",
+        message: "Isolated validator delinquency — network performance and transaction throughput are otherwise normal.",
+        time: nowTime,
+        timestamp: nowVal,
+        related_metrics: ["delinquency"]
+      });
+    }
+  }
+  
+  return correlated;
+}
+
 // ─── Route Handler ───────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
@@ -536,7 +614,9 @@ export default async function handler(req, res) {
     }
 
     // Anomaly alerts
-    const alerts = detectAnomalies(snapshot, historyCache);
+    const singleAlerts = detectAnomalies(snapshot, historyCache);
+    const correlatedAlerts = detectCorrelatedAnomalies(snapshot, historyCache, singleAlerts);
+    const alerts = [...singleAlerts, ...correlatedAlerts];
     snapshot.alerts = alerts;
     snapshot.anomalies = alerts;
 

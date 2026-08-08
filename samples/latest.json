@@ -1,32 +1,32 @@
 {
   "meta": {
-    "collected_at": "2026-08-08T13:07:45Z",
+    "collected_at": "2026-08-08T13:36:31Z",
     "source": "rpc-collector",
     "endpoint": "https://api.mainnet-beta.solana.com",
-    "cycle": 39,
+    "cycle": 211,
     "fast_interval_sec": 5,
     "cg_interval_sec": 30,
     "slow_interval_sec": 60,
-    "market_cache_age_sec": 1,
-    "supply_cache_age_sec": 22,
-    "defi_cache_age_sec": 55,
-    "news_cache_age_sec": 1,
-    "econ_cache_age_sec": 32,
-    "rwa_cache_age_sec": null,
+    "market_cache_age_sec": 9,
+    "supply_cache_age_sec": 62,
+    "defi_cache_age_sec": 11,
+    "news_cache_age_sec": 39,
+    "econ_cache_age_sec": 20,
+    "rwa_cache_age_sec": 121,
     "history_count": 20,
     "alerts_count": 0
   },
   "network": {
-    "tps": 3296.1,
-    "avgSlotTimeMs": 423.4,
-    "blockHeight": 437998412,
+    "tps": 3858.9,
+    "avgSlotTimeMs": 420.1,
+    "blockHeight": 438002523,
     "epochNumber": 1013,
-    "epochProgressPct": 88.52,
-    "epochSlotIndex": 382412,
+    "epochProgressPct": 89.47,
+    "epochSlotIndex": 386523,
     "epochSlotsInEpoch": 432000,
     "epochSlotStart": 437616000,
     "epochSlotEnd": 438048000,
-    "epochEtaHours": 5.83,
+    "epochEtaHours": 5.31,
     "healthStatus": "healthy"
   },
   "validators": {
@@ -72,27 +72,27 @@
     ]
   },
   "supply": {
-    "collected_at": "2026-08-08T13:07:06Z",
-    "totalSOL": 631755755.74,
-    "circulatingSOL": 582051135.44,
+    "collected_at": "2026-08-08T13:35:24Z",
+    "totalSOL": 631755740.45,
+    "circulatingSOL": 582051120.15,
     "nonCirculatingSOL": 49704620.3,
-    "_cache_age_sec": 22
+    "_cache_age_sec": 62
   },
   "market": {
-    "priceUsd": 75.4200275540119,
-    "change24hPct": 2.1493689177097375,
-    "marketCapUsd": 43902912283.0,
-    "volume24hUsd": 1520114821.0,
-    "circulatingSupply": 582051137.6904925,
-    "_blockId": 437998436,
-    "_liquidityUsd": 663346668.8031719,
-    "_cache_age_sec": 1
+    "priceUsd": 75.42392776138996,
+    "change24hPct": 1.8883449420303653,
+    "marketCapUsd": 43912141074.0,
+    "volume24hUsd": 1501007066.0,
+    "circulatingSupply": 582051121.5233725,
+    "_blockId": 438002532,
+    "_liquidityUsd": 662970174.8451271,
+    "_cache_age_sec": 9
   },
   "defi": {
-    "tvlUsd": 4779477043.0,
+    "tvlUsd": 4796897670.0,
     "stablecoinSupplyUsd": 16171076976.12,
     "dexVolume24hUsd": 1362524618.02,
-    "_cache_age_sec": 55
+    "_cache_age_sec": 11
   },
   "news": [
     {
@@ -129,9 +129,9 @@
   "economics_extra": {
     "medianFeeSol": 5e-06,
     "revUsd24h": 552239.0,
-    "rwaVolumeUsd": null,
-    "_cache_age_sec": 32,
-    "_rwa_cache_age_sec": null
+    "rwaVolumeUsd": 1830259060.9959319,
+    "_cache_age_sec": 20,
+    "_rwa_cache_age_sec": 121
   },
   "alerts": [],
   "anomalies": []

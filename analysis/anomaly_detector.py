@@ -284,6 +284,81 @@ def detect_anomalies(current: dict, history: list[dict], thresholds: dict[str, A
     return alerts
 
 
+def detect_correlated_anomalies(current: dict, history: list[dict], single_metric_alerts: list[dict]) -> list[dict[str, Any]]:
+    """
+    Examine the single_metric_alerts list for co-occurring anomalies.
+    Returns any correlated alert dictionaries representing multi-source anomalies.
+    """
+    correlated_alerts = []
+    iso_now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+    # Build a lookup of active alert metrics
+    active_metrics = {a.get("metric") for a in single_metric_alerts if a.get("metric")}
+
+    # 1. Congestion Check: TPS anomaly AND slot_time anomaly co-occurrence
+    if "tps" in active_metrics and "avg_slot_time_ms" in active_metrics:
+        correlated_alerts.append({
+            "id": "correlation-congestion",
+            "type": "correlated",
+            "severity": "critical",
+            "metric": "congestion",
+            "title": "Network Stress Detected (Multi-Source)",
+            "message": "Network stress detected: TPS drop + slot time increase occurring together — consistent with congestion, not isolated noise.",
+            "timestamp": iso_now,
+            "related_metrics": ["tps", "avg_slot_time_ms"]
+        })
+
+    # 2. Market Event Check: price_usd AND tvl_usd co-occurrence in the SAME direction
+    if "price_usd" in active_metrics and "tvl_usd" in active_metrics:
+        curr_norm = _normalize_snapshot(current)
+        
+        # Price direction
+        price_dir = 0
+        curr_price = curr_norm.get("price_usd")
+        prev_price = None
+        if history:
+            prev_price = _normalize_snapshot(history[-1]).get("price_usd")
+        if curr_price is not None and prev_price is not None and prev_price > 0:
+            price_dir = 1 if curr_price > prev_price else -1
+
+        # TVL direction
+        tvl_dir = 0
+        curr_tvl = curr_norm.get("tvl_usd")
+        hist_tvls = [h.get("tvl_usd") for h in [_normalize_snapshot(x) for x in history] if h.get("tvl_usd") is not None]
+        if curr_tvl is not None and hist_tvls:
+            tvl_mean = sum(hist_tvls) / len(hist_tvls)
+            tvl_dir = 1 if curr_tvl > tvl_mean else -1
+
+        if price_dir != 0 and tvl_dir != 0 and price_dir == tvl_dir:
+            direction_str = "upward" if price_dir > 0 else "downward"
+            correlated_alerts.append({
+                "id": "correlation-market",
+                "type": "correlated",
+                "severity": "critical",
+                "metric": "market",
+                "title": "Correlated Market Shift (Multi-Source)",
+                "message": f"Correlated market movement: SOL price and TVL moved together in a {direction_str} direction — broader market event likely, not an isolated data anomaly.",
+                "timestamp": iso_now,
+                "related_metrics": ["price_usd", "tvl_usd"]
+            })
+
+    # 3. Isolated Validator Delinquency Check
+    if "delinquent_validators" in active_metrics:
+        if "tps" not in active_metrics and "avg_slot_time_ms" not in active_metrics:
+            correlated_alerts.append({
+                "id": "correlation-isolated-delinquency",
+                "type": "correlated",
+                "severity": "warning",
+                "metric": "delinquent_validators",
+                "title": "Isolated Delinquency (Multi-Source)",
+                "message": "Isolated validator delinquency — network performance and transaction throughput are otherwise normal.",
+                "timestamp": iso_now,
+                "related_metrics": ["delinquent_validators"]
+            })
+
+    return correlated_alerts
+
+
 # ─── Standalone Runner ────────────────────────────────────────────────────────
 
 
@@ -343,8 +418,25 @@ if __name__ == "__main__":
 
         print("\n--- Test 1: Realistic TPS Drop (3200 -> 2400 TPS) ---", file=sys.stderr)
         res1 = detect_anomalies(synth_anomalous_tps, synth_history, verbose=True)
-        print(json.dumps(res1, indent=2))
+        corr1 = detect_correlated_anomalies(synth_anomalous_tps, synth_history, res1)
+        print("Single alerts:", json.dumps(res1, indent=2))
+        print("Correlated alerts:", json.dumps(corr1, indent=2))
 
         print("\n--- Test 2: Realistic Slot Time Rise (420ms -> 495ms) ---", file=sys.stderr)
         res2 = detect_anomalies(synth_anomalous_st, synth_history, verbose=True)
-        print(json.dumps(res2, indent=2))
+        corr2 = detect_correlated_anomalies(synth_anomalous_st, synth_history, res2)
+        print("Single alerts:", json.dumps(res2, indent=2))
+        print("Correlated alerts:", json.dumps(corr2, indent=2))
+
+        # Test anomaly 3: Co-occurring TPS drop AND Slot Time rise (Congestion)
+        synth_anomalous_both = {
+            "network": {"tps": 2400.0, "avgSlotTimeMs": 495.0},
+            "validators": {"activeCount": 1520, "delinquentCount": 11},
+            "market": {"priceUsd": 73.40},
+            "defi": {"tvlUsd": 4.75e9},
+        }
+        print("\n--- Test 3: Co-occurring TPS Drop & Slot Time Rise (Congestion) ---", file=sys.stderr)
+        res3 = detect_anomalies(synth_anomalous_both, synth_history, verbose=True)
+        corr3 = detect_correlated_anomalies(synth_anomalous_both, synth_history, res3)
+        print("Single alerts:", json.dumps(res3, indent=2))
+        print("Correlated alerts:", json.dumps(corr3, indent=2))

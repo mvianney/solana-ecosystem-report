@@ -59,7 +59,7 @@ import time
 
 import concurrent.futures
 
-from analysis.anomaly_detector import detect_anomalies
+from analysis.anomaly_detector import detect_anomalies, detect_correlated_anomalies
 from collectors.coingecko_collector import get_sol_market_data
 from collectors.defillama_collector import collect_all as collect_defillama
 from collectors.economics_collector import get_median_tx_fee, get_rev, get_rwa_volume
@@ -513,7 +513,9 @@ def _fast_loop(fast_interval: int, output: pathlib.Path) -> None:
             recent_history = get_recent(n=20)
             # Compare current snapshot against baseline history prior to this snapshot
             baseline_history = recent_history[:-1] if len(recent_history) > 1 else []
-            alerts = detect_anomalies(current=snapshot, history=baseline_history, verbose=False)
+            single_alerts = detect_anomalies(current=snapshot, history=baseline_history, verbose=False)
+            corr_alerts = detect_correlated_anomalies(current=snapshot, history=baseline_history, single_metric_alerts=single_alerts)
+            alerts = single_alerts + corr_alerts
         except Exception as exc:  # noqa: BLE001
             _log("FAST", f"WARNING: history/anomaly check failed ({exc!r})")
             alerts = []

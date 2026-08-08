@@ -1,5 +1,5 @@
 # Solana Ecosystem Health Report
-*Generated at: `2026-08-08T13:07:45Z` (UTC)*
+*Generated at: `2026-08-08T13:36:31Z` (UTC)*
 
 ## Anomaly & Alert Summary
 ✅ **All systems nominal.** No anomalies detected in current network performance metrics.
@@ -7,10 +7,10 @@
 ## Network Performance
 | Metric | Current Value | Details |
 |---|---|---|
-| **TPS** | 3,296.10 | Rolling 60s transaction throughput |
-| **Slot Time** | 423.40 ms | Avg time to produce a block |
-| **Block Height** | 437,998,412 | Current finalized slot |
-| **Epoch Progress** | 88.5% complete | Epoch 1013 (~5.83h remaining) |
+| **TPS** | 3,858.90 | Rolling 60s transaction throughput |
+| **Slot Time** | 420.10 ms | Avg time to produce a block |
+| **Block Height** | 438,002,523 | Current finalized slot |
+| **Epoch Progress** | 89.5% complete | Epoch 1013 (~5.31h remaining) |
 | **Health Status** | HEALTHY | RPC node status check |
 
 ## Validator Health
@@ -30,17 +30,17 @@
 ## Economic Indicators
 | Metric | Value | Source |
 |---|---|---|
-| **SOL Price (USD)** | $75.42 (+2.15%) | Jupiter Spot Price |
-| **Market Cap** | $43.90B | CoinGecko |
-| **CEX Volume (24h)** | $1.52B | CoinGecko |
-| **DeFi TVL (USD)** | $4.78B | DeFiLlama |
+| **SOL Price (USD)** | $75.42 (+1.89%) | Jupiter Spot Price |
+| **Market Cap** | $43.91B | CoinGecko |
+| **CEX Volume (24h)** | $1.50B | CoinGecko |
+| **DeFi TVL (USD)** | $4.80B | DeFiLlama |
 | **Stablecoin Supply** | $16.17B | DeFiLlama |
 | **DEX Volume (24h)** | $1.36B | DeFiLlama |
 | **Real Economic Value (REV)** | $552.24K | DeFiLlama (User fees) |
 | **Median Transaction Fee** | 0.000005 SOL | Solana JSON-RPC (priority + base) |
 
 ## Ecosystem Growth
-- **Tokenized RWA TVL**: N/A *(Source: DeFiLlama RWA category)*
+- **Tokenized RWA TVL**: $1.83B *(Source: DeFiLlama RWA category)*
 - **Daily Active Addresses**: *Not available — no free public API*
 
 ## News & Announcements
