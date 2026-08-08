@@ -1,81 +1,138 @@
 {
   "meta": {
-    "collected_at": "2026-08-07T15:21:09Z",
+    "collected_at": "2026-08-08T13:07:45Z",
     "source": "rpc-collector",
-    "endpoint": "https://api.mainnet-beta.solana.com"
+    "endpoint": "https://api.mainnet-beta.solana.com",
+    "cycle": 39,
+    "fast_interval_sec": 5,
+    "cg_interval_sec": 30,
+    "slow_interval_sec": 60,
+    "market_cache_age_sec": 1,
+    "supply_cache_age_sec": 22,
+    "defi_cache_age_sec": 55,
+    "news_cache_age_sec": 1,
+    "econ_cache_age_sec": 32,
+    "rwa_cache_age_sec": null,
+    "history_count": 20,
+    "alerts_count": 0
   },
   "network": {
-    "tps": 4390.3,
-    "avgSlotTimeMs": 423.6,
-    "blockHeight": 437812659,
+    "tps": 3296.1,
+    "avgSlotTimeMs": 423.4,
+    "blockHeight": 437998412,
     "epochNumber": 1013,
-    "epochProgressPct": 45.52,
-    "epochSlotIndex": 196659,
+    "epochProgressPct": 88.52,
+    "epochSlotIndex": 382412,
     "epochSlotsInEpoch": 432000,
     "epochSlotStart": 437616000,
     "epochSlotEnd": 438048000,
-    "epochEtaHours": 27.69,
+    "epochEtaHours": 5.83,
     "healthStatus": "healthy"
   },
   "validators": {
-    "activeCount": null,
-    "delinquentCount": null,
-    "avgCommissionPct": null,
-    "topValidators": []
+    "activeCount": 692,
+    "delinquentCount": 8,
+    "avgCommissionPct": 12.36,
+    "topValidators": [
+      {
+        "votePubkey": "CcaHc2L43ZWjwCHART3oZoJvHLAe9hzT2DJNUpBzoTN1",
+        "name": "CcaHc2L4\u2026",
+        "activated_stake_sol": 16882234.36,
+        "stake_pct": 2.67,
+        "commission": 7
+      },
+      {
+        "votePubkey": "he1iusunGwqrNtafDtLdhsUQDFvo13z9sUa36PauBtk",
+        "name": "he1iusun\u2026",
+        "activated_stake_sol": 15996914.31,
+        "stake_pct": 2.53,
+        "commission": 0
+      },
+      {
+        "votePubkey": "CatzoSMUkTRidT5DwBxAC2pEtnwMBTpkCepHkFgZDiqb",
+        "name": "CatzoSMU\u2026",
+        "activated_stake_sol": 12487724.13,
+        "stake_pct": 1.98,
+        "commission": 5
+      },
+      {
+        "votePubkey": "3N7s9zXMZ4QqvHQR15t5GNHyqc89KduzMP7423eWiD5g",
+        "name": "3N7s9zXM\u2026",
+        "activated_stake_sol": 12275238.62,
+        "stake_pct": 1.94,
+        "commission": 0
+      },
+      {
+        "votePubkey": "26pV97Ce83ZQ6Kz9XT4td8tdoUFPTng8Fb8gPyc53dJx",
+        "name": "26pV97Ce\u2026",
+        "activated_stake_sol": 9139569.3,
+        "stake_pct": 1.45,
+        "commission": 7
+      }
+    ]
   },
   "supply": {
-    "collected_at": "2026-08-07T15:21:24Z",
-    "totalSOL": 631756452.72,
-    "circulatingSOL": 582051832.81,
-    "nonCirculatingSOL": 49704619.91
+    "collected_at": "2026-08-08T13:07:06Z",
+    "totalSOL": 631755755.74,
+    "circulatingSOL": 582051135.44,
+    "nonCirculatingSOL": 49704620.3,
+    "_cache_age_sec": 22
   },
   "market": {
-    "priceUsd": 73.7404497779168,
-    "change24hPct": 0.5983903878183348,
-    "marketCapUsd": 42935007361.0,
-    "volume24hUsd": 1521802582.0,
-    "circulatingSupply": 582051845.3931724
+    "priceUsd": 75.4200275540119,
+    "change24hPct": 2.1493689177097375,
+    "marketCapUsd": 43902912283.0,
+    "volume24hUsd": 1520114821.0,
+    "circulatingSupply": 582051137.6904925,
+    "_blockId": 437998436,
+    "_liquidityUsd": 663346668.8031719,
+    "_cache_age_sec": 1
   },
   "defi": {
-    "tvlUsd": 4750230694.0,
-    "stablecoinSupplyUsd": 16088094681.27,
-    "dexVolume24hUsd": 1379094026.1799998
+    "tvlUsd": 4779477043.0,
+    "stablecoinSupplyUsd": 16171076976.12,
+    "dexVolume24hUsd": 1362524618.02,
+    "_cache_age_sec": 55
   },
   "news": [
     {
-      "title": "Solana Changelog: August 6, 2026",
-      "link": "https://solana.com/news/solana-changelog-august-6-2026",
-      "published": "Thu, 06 Aug 2026 17:57:00 GMT",
-      "source": "Solana Blog"
+      "title": "Morgan Stanley expands crypto lineup with Ether, Solana ETPs",
+      "link": "https://cointelegraph.com/markets/morgan-stanley-expands-crypto-lineup-with-ether-solana-etps?utm_source=rss_feed&utm_medium=rss_tag_solana&utm_campaign=rss_partner_inbound",
+      "published": "Tue, 28 Jul 2026 20:10:46 +0000",
+      "source": "Cointelegraph Solana"
     },
     {
-      "title": "Webinar Recap: Giving AI agents a native way to pay with x402",
-      "link": "https://solana.com/news/webinar-recap-agentic-payments",
-      "published": "Wed, 05 Aug 2026 18:55:00 GMT",
-      "source": "Solana Blog"
+      "title": "Ethereum, Solana led crypto hack losses in H1 2026: Blockaid",
+      "link": "https://cointelegraph.com/news/ethereum-solana-led-crypto-hack-losses-h1-2026-blockaid?utm_source=rss_feed&utm_medium=rss_tag_solana&utm_campaign=rss_partner_inbound",
+      "published": "Tue, 28 Jul 2026 13:00:00 +0000",
+      "source": "Cointelegraph Solana"
     },
     {
-      "title": "Solana Ecosystem Roundup: July 2026",
-      "link": "https://solana.com/news/solana-ecosystem-roundup-july-2026",
-      "published": "Wed, 05 Aug 2026 09:33:00 GMT",
-      "source": "Solana Blog"
+      "title": "Solana community lead enters UK by-election with onchain transparency pitch",
+      "link": "https://cointelegraph.com/news/solana-community-lead-uk-by-election-pension-self-custody?utm_source=rss_feed&utm_medium=rss_tag_solana&utm_campaign=rss_partner_inbound",
+      "published": "Tue, 14 Jul 2026 11:38:00 +0000",
+      "source": "Cointelegraph Solana"
     },
     {
-      "title": "Breakpoint 2026: The Token Supercycle",
-      "link": "https://solana.com/news/the-token-supercycle",
-      "published": "Tue, 04 Aug 2026 13:05:00 GMT",
-      "source": "Solana Blog"
+      "title": "SOL rallies as Solana memecoins, prediction market activity surge: Are bulls back?",
+      "link": "https://cointelegraph.com/markets/sol-rallies-as-solana-memecoins-prediction-market-activity-surge-are-bulls-back?utm_source=rss_feed&utm_medium=rss_tag_solana&utm_campaign=rss_partner_inbound",
+      "published": "Fri, 03 Jul 2026 21:36:02 +0000",
+      "source": "Cointelegraph Solana"
     },
     {
-      "title": "Inside Solana\u2019s Growing Market for Tokenized Cards and Physical Collectibles",
-      "link": "https://solana.com/news/tokenized-cards-and-physical-collectibles",
-      "published": "Fri, 31 Jul 2026 10:00:00 GMT",
-      "source": "Solana Blog"
+      "title": "Solana Foundation launches framework for protocol-level governance",
+      "link": "https://cointelegraph.com/news/solana-foundation-framework-protocol-governance?utm_source=rss_feed&utm_medium=rss_tag_solana&utm_campaign=rss_partner_inbound",
+      "published": "Thu, 02 Jul 2026 10:59:43 +0000",
+      "source": "Cointelegraph Solana"
     }
   ],
   "economics_extra": {
     "medianFeeSol": 5e-06,
-    "revUsd24h": 516121.0,
-    "rwaVolumeUsd": 1815709513.7486901
-  }
+    "revUsd24h": 552239.0,
+    "rwaVolumeUsd": null,
+    "_cache_age_sec": 32,
+    "_rwa_cache_age_sec": null
+  },
+  "alerts": [],
+  "anomalies": []
 }
