@@ -147,4 +147,6 @@ solana-ecosystem-report/
 
 ## 8. Live Demo
 
-*   **Hosted URL**: *[Deploy placeholder — link to be updated upon hosting]*
+https://solana-ecosystem-report.vercel.app/
+
+Deployed on Vercel — the dashboard fetches live Solana network, validator, price, and DeFi data via a serverless API route (api/data.js). For local development with the full Python data pipeline (including anomaly detection, history tracking, and Markdown/JSON report generation), see Setup Instructions below.
