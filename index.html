@@ -183,9 +183,42 @@
       color: var(--text-2);
     }
 
-    /* ── Hide decorative canvas waveform ── */
+    /* ── Pulse Sparkline Waveform ── */
     .pulse-strip {
-      display: none !important;
+      display: block !important;
+      height: 24px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .pulse-label {
+      position: absolute;
+      top: 5px;
+      left: 16px;
+      font-size: 8px;
+      font-weight: 600;
+      color: var(--text-2);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .pulse-label-right {
+      position: absolute;
+      top: 5px;
+      right: 16px;
+      font-size: 8px;
+      font-weight: 600;
+      color: var(--text-2);
+      pointer-events: none;
+    }
+
+    #pulse-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -1450,7 +1483,7 @@
       const ctx     = canvas.getContext("2d");
       const DPR     = Math.min(window.devicePixelRatio || 1, 2);
       const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const H_CSS   = 58; // logical canvas height in px
+      const H_CSS   = 24; // logical canvas height in px
 
       // Physics state
       let physY    = 0.5;
@@ -1506,12 +1539,6 @@
 
         if (points.length < 2) return;
 
-        const gradL = ctx.createLinearGradient(0, 0, W, 0);
-        gradL.addColorStop(0,    "rgba(153,69,255,0.0)");
-        gradL.addColorStop(0.15, "rgba(153,69,255,0.35)");
-        gradL.addColorStop(0.6,  "rgba(130,100,255,0.75)");
-        gradL.addColorStop(1,    "rgba(20,241,149,1)");
-
         // Draw path helper
         function buildPath() {
           ctx.beginPath();
@@ -1523,43 +1550,31 @@
           }
         }
 
-        // Outer glow
-        buildPath();
-        ctx.strokeStyle = gradL;
-        ctx.lineWidth   = 7;
-        ctx.lineCap     = "round";
-        ctx.lineJoin    = "round";
-        ctx.shadowBlur  = 18;
-        ctx.shadowColor = "rgba(153,69,255,0.55)";
-        ctx.stroke();
-        ctx.shadowBlur  = 0;
-
-        // Sharp inner line
+        // Crisp 1px accent blue sparkline (no shadow glow)
         buildPath();
         const gradS = ctx.createLinearGradient(0, 0, W, 0);
-        gradS.addColorStop(0,    "rgba(153,69,255,0.0)");
-        gradS.addColorStop(0.2,  "rgba(153,69,255,0.7)");
-        gradS.addColorStop(1,    "rgba(20,241,149,1)");
+        gradS.addColorStop(0,    "rgba(59, 130, 246, 0.0)");
+        gradS.addColorStop(0.3,  "rgba(59, 130, 246, 0.45)");
+        gradS.addColorStop(1,    "rgba(59, 130, 246, 1.0)");
         ctx.strokeStyle = gradS;
-        ctx.lineWidth   = 1.6;
+        ctx.lineWidth   = 1.0;
+        ctx.lineCap     = "round";
+        ctx.lineJoin    = "round";
         ctx.stroke();
 
-        // Leading-edge glow dot
+        // Leading-edge tiny blue dot (no shadow glow)
         const lx = W;
         const ly = points[points.length - 1] * H;
         ctx.beginPath();
-        ctx.arc(lx, ly, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle  = "#14F195";
-        ctx.shadowBlur = 14;
-        ctx.shadowColor = "#14F195";
+        ctx.arc(lx, ly, 2.0, 0, Math.PI * 2);
+        ctx.fillStyle  = "#3B82F6";
         ctx.fill();
-        ctx.shadowBlur = 0;
 
         // Horizontal centre reference line (very subtle)
         ctx.beginPath();
         ctx.moveTo(0, H * 0.5);
         ctx.lineTo(W, H * 0.5);
-        ctx.strokeStyle = "rgba(153,69,255,0.06)";
+        ctx.strokeStyle = "rgba(48, 54, 61, 0.4)";
         ctx.lineWidth   = 1;
         ctx.setLineDash([4, 8]);
         ctx.stroke();
@@ -1574,13 +1589,13 @@
         ctx.clearRect(0, 0, W, H);
 
         const g = ctx.createLinearGradient(0, 0, W, 0);
-        g.addColorStop(0, "rgba(153,69,255,0.2)");
-        g.addColorStop(1, "rgba(20,241,149,0.5)");
+        g.addColorStop(0, "rgba(59, 130, 246, 0.15)");
+        g.addColorStop(1, "rgba(59, 130, 246, 0.45)");
         ctx.beginPath();
         ctx.moveTo(0, H * 0.5);
         ctx.lineTo(W, H * 0.5);
         ctx.strokeStyle = g;
-        ctx.lineWidth   = 1.5;
+        ctx.lineWidth   = 1.0;
         ctx.stroke();
       }
 
